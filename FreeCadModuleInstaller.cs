@@ -1,11 +1,13 @@
 ﻿namespace Toltech.FreeCAD
 {
-
     /// <summary>
     /// Installe le module Python Toltech dans FreeCAD.
     /// </summary>
     public sealed class FreeCadModuleInstaller
     {
+        private const string PreferredVersion = "v1-1";
+
+        private const string CADName = "FreeCAD";
         private const string ModuleName = "Toltech";
 
         private readonly string _sourceDirectory;
@@ -13,18 +15,27 @@
         private readonly string _freeCadDirectory;
 
         public FreeCadModuleInstaller(
-            string sourceDirectory,
-            string freeCadDirectory)
+            string sourceDirectory)
         {
             _sourceDirectory = sourceDirectory;
-            _freeCadDirectory = freeCadDirectory;
+            _freeCadDirectory = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                CADName,
+                PreferredVersion);
         }
 
         /// <summary>
         /// Installe ou met à jour le module Python Toltech.
+        /// Ne fait rien si FreeCAD n'est pas installé (ou jamais lancé).
         /// </summary>
         public void Install()
         {
+            // FreeCAD absent : on ne crée rien dans le profil utilisateur
+            if (!Directory.Exists(_freeCadDirectory))
+            {
+                return;
+            }
+
             string targetDirectory =
                 Path.Combine(
                     _freeCadDirectory,
